@@ -1,0 +1,13 @@
+./runPyscript.sh lstm.py --extra-args "--data_path=samples/ --config_file=config_hidden2000_max20_keep09_decay09_batch35.txt" --job-id config_hidden2000_max20_keep09_decay09_batch35_Adam --checkpoint_path=checkpoints/
+./runPyscript.sh lstm.py --extra-args "--data_path=samples/ --config_file=config_hidden3000_max20_keep08_decay09_batch35.txt" --job-id config_hidden3000_max20_keep08_decay09_batch35_Adam --checkpoint_path=checkpoints/
+./runPyscript.sh lstm.py --extra-args "--data_path=samples/ --config_file=config_hidden3000_max20_keep09_decay085_batch35.txt" --job-id config_hidden3000_max20_keep09_decay085_batch35_Adam --checkpoint_path=checkpoints/
+./runPyscript.sh lstm.py --extra-args "--data_path=samples/ --config_file=config_hidden3000_max20_keep09_decay095_batch35.txt" --job-id config_hidden3000_max20_keep09_decay095_batch35_Adam --checkpoint_path=checkpoints/
+./runPyscript.sh lstm.py --extra-args "--data_path=samples/ --config_file=config_hidden3000_max20_keep09_decay09_batch100.txt" --job-id config_hidden3000_max20_keep09_decay09_batch100_Adam --checkpoint_path=checkpoints/
+./runPyscript.sh lstm.py --extra-args "--data_path=samples/ --config_file=config_hidden3000_max20_keep09_decay09_batch35.txt" --job-id config_hidden3000_max20_keep09_decay09_batch35_Adam --checkpoint_path=checkpoints/
+./runPyscript.sh lstm.py --extra-args "--data_path=samples/ --config_file=config_hidden3000_max20_keep1_decay09_batch35.txt" --job-id config_hidden3000_max20_keep1_decay09_batch35_Adam --checkpoint_path=checkpoints/
+./runPyscript.sh lstm.py --extra-args "--data_path=samples/ --config_file=config_hidden3000_max25_keep09_decay09_batch35.txt" --job-id onfig_hidden3000_max25_keep09_decay09_batch35_Adam --checkpoint_path=checkpoints/
+./runPyscript.sh lstm.py --extra-args "--data_path=samples/ --config_file=config_hidden4000_max20_keep08_decay09_batch35.txt" --job-id onfig_hidden4000_max20_keep08_decay09_batch35_Adam --checkpoint_path=checkpoints/
+./runPyscript.sh lstm.py --extra-args "--data_path=samples/ --config_file=config_hidden3000_max20_keep09_decay09_batch50.txt" --job-id config_hidden3000_max20_keep09_decay09_batch50_Adam --checkpoint_path=checkpoints/
+./runPyscript.sh lstm.py --extra-args "--data_path=samples/ --config_file=config_hidden3000_max20_keep09_decay09_batch35_2layers.txt" --job-id config_hidden3000_max20_keep09_decay09_batch35_2layers_Adam --checkpoint_path=checkpoints/
+./runPyscript.sh lstm.py --extra-args "--data_path=samples/ --config_file=config_hidden3000_max20_keep095_decay095_batch35.txt" --job-id config_hidden3000_max20_keep095_decay095_batch35_Adam --checkpoint_path=checkpoints/
+
