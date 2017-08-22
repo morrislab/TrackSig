@@ -44,7 +44,7 @@ signature_file = "annotation/alexSignatures.txt"
 active_signatures_file = "annotation/active_signatures_transposed.txt"
 
 # specifies active signatures in each sample. Contains the active signatures for the example
-#active_signatures_file = "annotation/active_in_samples.txt"
+# active_signatures_file = "annotation/active_in_samples.txt"
 
 SAVED_SAMPLES_DIR = "saved_data/"
 
