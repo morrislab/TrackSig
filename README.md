@@ -79,7 +79,7 @@ Compute signature trajectories for all samples:
 Rcript src/compute_mutational_signatures.R
 ```
 
-Results can be found in DIR_RESULTS folder specified in `src/header.R` (by default "results_signature_trajectories") in appropriate cancer type and tumor id folders. Signature trajectories are stored in `mixtures.csv`. Rows correspond to signatures. Columns correspond to time points. The columns are named by the average cellular prevalence that corresponds to the time point.
+Results can be found in "results_signature_trajectories" folder (by default, specified in by DIR_RESULTS in `src/header.R`) in appropriate cancer type and tumor id folders. Signature trajectories are stored in `mixtures.csv`. Rows correspond to signatures. Columns correspond to time points. The columns are named by the average cellular prevalence that corresponds to the time point.
 
 If you wish to compute uncertainty for trajectories as well, set `compute_bootstrap parameter` in `src/header.R` to TRUE before running the script (slows down the computation).
 
@@ -121,7 +121,11 @@ We recommmend to estimate active signatures first (as described above) instead o
 To specify a separate set of active signatures for each sample:
 
 1) in `src/header.R` set cancer_type_signatures = FALSE   
-2) in `src/header.R` set active_signatures_file to the file with active signatures per sample. See example of such file in annotation/active_in_samples.txt.
+2) in `src/header.R` set active_signatures_file to the file with active signatures per sample. See example of such file in `annotation/active_in_samples.txt`.
+
+### Providing new signatures
+
+Signatures provided in the repo are from [COSMIC](http://cancer.sanger.ac.uk/cosmic/signatures) located in `annotation/alexSignatures.txt`. You can use your own signatures by providing path to another signature file through `signature_file` parameter in `src/header.R`.
 
 ## Notes
 Please note that Trackature does not run on samples with less than 600 mutations. Less than 600 mutations will result in less than 3 time points, and there is no point to analize it as a time series. On tumors with less than 600 mutations, you can compute signature exposures without dividing mutations into time points (see "Computing overall signature exposures" section).
