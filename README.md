@@ -18,8 +18,8 @@ Cell processes leave a unique signature of mutation types in cancer genome. Usin
 
 ## Input
 - VCF file with point mutations  
-  Vcf file should be named as tumor_id.vcf, where tumor_id is an id of the tumor.  
-  INFO column in VAF file should contain reference and alternate read counts in the following format: "t_alt_count=5;t_ref_count=20". 
+  VCF file should be named as tumor_id.vcf, where tumor_id is an id of the tumor.  
+  INFO column in VCF file should contain reference and alternate read counts in the following format: "t_alt_count=5;t_ref_count=20". 
 
 Optional:  
 - Sample purity  
