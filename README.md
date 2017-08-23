@@ -72,6 +72,10 @@ where the first parameter is the vcf file and the second parameter is file with 
 
 Requires hg19 reference which can be downloaded from here: http://hgdownload.cse.ucsc.edu/goldenPath/hg19/chromosomes/
 
+Using an `rsync` command to download all the hg19 reference files: 
+```
+rsync -avzP rsync://hgdownload.cse.ucsc.edu/goldenPath/hg19/chromosomes/ ./annotation/hg19/
+```
 
 
 
