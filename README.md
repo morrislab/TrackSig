@@ -23,16 +23,17 @@ Cell processes leave a unique signature of mutation types in cancer genome. Usin
 
 Optional:  
 - Sample purity  
-The format is the following: (tab-delimited)
+  The format is the following: (tab-delimited)
 ```
 samplename	purity
 example	0.7
 ```
-The file should contain for purities for all your samples. The "samplename" column should match the name of the vcf file. Please refer to the example in `data/example_purity.txt`
+
+  The file should contain for purities for all your samples. The "samplename" column should match the name of the vcf file. Please refer to the example in `data/example_purity.txt`
 
 - Copy number alteration calls
 
-The format is the following: (tab-delimited)
+  The format is the following: (tab-delimited)
 ```
 chromosome      start   end     total_cn
 1       2888343        3263790        3
