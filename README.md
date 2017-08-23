@@ -23,9 +23,20 @@ Cell processes leave a unique signature of mutation types in cancer genome. Usin
 
 Optional:  
 - Sample purity  
-  Please refer to the example for the format of tumor purity file. The file should be tab-delimited and contain at least two columns: "samplename" and "purity". The "samplename" column should match the name of the vcf file.
+The format is the following: (tab-delimited)
+```
+samplename	purity
+example	0.7
+```
+The file should contain for purities for all your samples. The "samplename" column should match the name of the vcf file. Please refer to the example in `data/example_purity.txt`
 
 - Copy number alteration calls
+
+The format is the following: (tab-delimited)
+```
+chromosome      start   end     total_cn
+1       2888343        3263790        3
+```
 
 ## Usage 
 The commands below assume starting from the 'Trackature' directory. The example.vcf is provided in the repo. Running the code as written below will compute signature trajectories for the example.
@@ -43,9 +54,12 @@ It is recommended to correct VAF by copy number and tumor purity if those are av
 ```
 python src/make_corrected_vaf.py --vcf data/example.vcf --cnv your_cna_call_file.txt --purity purity_file.txt --output data/example_vaf.txt
 ```
-Please refer to the example for the format of tumor purity file. The file should be tab-delimited and contain at least two columns: "samplename" and "purity". The "samplename" column should match the name of the vcf file.
-
-To make use of purities when correcting VAF, provide the name of the purity file to make_corrected_vaf.py with parameter "--purity".
+Please refer to the example for the format of tumor purity file. The file should be tab-delimited in the following format:
+```
+samplename	purity
+example	0.7
+```
+The "samplename" column should match the name of the vcf file. To make use of purities when correcting VAF, provide the name of the purity file to make_corrected_vaf.py with parameter "--purity".
 
 ### Making mutation counts
 
