@@ -7,13 +7,15 @@ Cell processes leave a unique signature of mutation types in cancer genome. Usin
 
 ## Dependencies
 - Python 2.7.9  
-  Packages: pyvcf (pip2 install pyvcf)
+  Packages: pyvcf, csv, scipy, numpy  
+  Packages can be installed using `pip2 install package_name` command.
   
 - Perl v5.18.2  
   Packages: Bio::DB::Fasta. Please refer to http://www.cpan.org/modules/INSTALL.html on how to install packages on your machine. On Mac OS and Unix: sudo cpan Bio::DB::Fasta
   
 - R 3.1.2  
-  Packages: reshape2, ggplot2, NMF. R packages can be installed using install.packages("package_name") command.
+  Packages: reshape2, ggplot2, NMF  
+  R packages can be installed using install.packages("package_name") command.
 
 
 ## Input
