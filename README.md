@@ -7,25 +7,39 @@ Cell processes leave a unique signature of mutation types in cancer genome. Usin
 
 ## Dependencies
 - Python 2.7.9  
-  Packages: pyvcf (pip2 install pyvcf)
+  Packages: pyvcf, csv, scipy, numpy  
+  Packages can be installed using `pip2 install package_name` command.
   
 - Perl v5.18.2  
   Packages: Bio::DB::Fasta. Please refer to http://www.cpan.org/modules/INSTALL.html on how to install packages on your machine. On Mac OS and Unix: sudo cpan Bio::DB::Fasta
   
 - R 3.1.2  
-  Packages: reshape2, ggplot2, NMF. R packages can be installed using install.packages("package_name") command.
+  Packages: reshape2, ggplot2, NMF  
+  R packages can be installed using install.packages("package_name") command.
 
 
 ## Input
 - VCF file with point mutations  
-  Vcf file should be named as tumor_id.vcf, where tumor_id is an id of the tumor.  
-  INFO column in VAF file should contain reference and alternate read counts in the following format: "t_alt_count=5;t_ref_count=20". 
+  VCF file should be named as tumor_id.vcf, where tumor_id is an id of the tumor.  
+  INFO column in VCF file should contain reference and alternate read counts in the following format: "t_alt_count=5;t_ref_count=20". 
 
 Optional:  
 - Sample purity  
-  Please refer to the example for the format of tumor purity file. The file should be tab-delimited and contain at least two columns: "samplename" and "purity". The "samplename" column should match the name of the vcf file.
+  The format is the following: (tab-delimited)
+```
+samplename	purity
+example	0.7
+```
+
+  The file should contain for purities for all your samples. The "samplename" column should match the name of the vcf file. Please refer to the example in `data/example_purity.txt`
 
 - Copy number alteration calls
+
+  The format is the following: (tab-delimited)
+```
+chromosome      start   end     total_cn
+1       2888343        3263790        3
+```
 
 ## Usage 
 The commands below assume starting from the 'Trackature' directory. The example.vcf is provided in the repo. Running the code as written below will compute signature trajectories for the example.
@@ -43,9 +57,12 @@ It is recommended to correct VAF by copy number and tumor purity if those are av
 ```
 python src/make_corrected_vaf.py --vcf data/example.vcf --cnv your_cna_call_file.txt --purity purity_file.txt --output data/example_vaf.txt
 ```
-Please refer to the example for the format of tumor purity file. The file should be tab-delimited and contain at least two columns: "samplename" and "purity". The "samplename" column should match the name of the vcf file.
-
-To make use of purities when correcting VAF, provide the name of the purity file to make_corrected_vaf.py with parameter "--purity".
+Please refer to the example for the format of tumor purity file. The file should be tab-delimited in the following format:
+```
+samplename	purity
+example	0.7
+```
+The "samplename" column should match the name of the vcf file. To make use of purities when correcting VAF, provide the name of the purity file to make_corrected_vaf.py with parameter "--purity".
 
 ### Making mutation counts
 
@@ -57,6 +74,10 @@ where the first parameter is the vcf file and the second parameter is file with 
 
 Requires hg19 reference which can be downloaded from here: http://hgdownload.cse.ucsc.edu/goldenPath/hg19/chromosomes/
 
+Using an `rsync` command to download all the hg19 reference files: 
+```
+rsync -avzP rsync://hgdownload.cse.ucsc.edu/goldenPath/hg19/chromosomes/ ./annotation/hg19/
+```
 
 
 
@@ -76,7 +97,7 @@ tumortype_file <- "data/tumortypes.txt"
 
 Compute signature trajectories for all samples:
 ```
-Rcript src/compute_mutational_signatures.R
+Rscript src/compute_mutational_signatures.R
 ```
 
 Results can be found in "results_signature_trajectories" folder (by default, specified in by DIR_RESULTS in `src/header.R`) in appropriate cancer type and tumor id folders. Signature trajectories are stored in `mixtures.csv`. Rows correspond to signatures. Columns correspond to time points. The columns are named by the average cellular prevalence that corresponds to the time point.
