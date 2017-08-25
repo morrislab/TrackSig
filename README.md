@@ -97,7 +97,7 @@ tumortype_file <- "data/tumortypes.txt"
 
 Compute signature trajectories for all samples:
 ```
-Rcript src/compute_mutational_signatures.R
+Rscript src/compute_mutational_signatures.R
 ```
 
 Results can be found in "results_signature_trajectories" folder (by default, specified in by DIR_RESULTS in `src/header.R`) in appropriate cancer type and tumor id folders. Signature trajectories are stored in `mixtures.csv`. Rows correspond to signatures. Columns correspond to time points. The columns are named by the average cellular prevalence that corresponds to the time point.
