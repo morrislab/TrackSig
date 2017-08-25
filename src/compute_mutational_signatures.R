@@ -284,6 +284,7 @@ compute_errorbars_for_all_examples <- function(bootstrap_counts = BOOTSTRAP_COUN
     list[mixtures_bootstrap, changepoints_bootstrap] <- get_bootstrap_mixtures(bootstrap_vcfs, bootstrap_phis, alex.t, dir_name, "")
     list[mixtures.mean, mixtures.sd, mixtures.err] <- compute_mean_sd_err(mixtures_bootstrap, rownames(mixtures), dir_name)
     
+    transition_points = NULL
     plot_name <- paste0(dir_name, "/", acronym, "_", example, "_", sig_amount)
     
     if (PLOT_FULL_NAME)
