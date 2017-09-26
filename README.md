@@ -149,9 +149,10 @@ To specify a separate set of active signatures for each sample:
 
 Signatures provided in the repo are from [COSMIC](http://cancer.sanger.ac.uk/cosmic/signatures) located in `annotation/alexSignatures.txt`. You can use your own signatures by providing path to another signature file through `signature_file` parameter in `src/header.R`.
 
-## Notes
-Please note that Trackature does not run on samples with less than 600 mutations. Less than 600 mutations will result in less than 3 time points, and there is no point to analize it as a time series. On tumors with less than 600 mutations, you can compute signature exposures without dividing mutations into time points (see "Computing overall signature exposures" section).
+## Important notes
+1) Please note that Trackature does not run on samples with less than 600 mutations. Less than 600 mutations will result in less than 3 time points, and there is no point to analize it as a time series. On tumors with less than 600 mutations, you can compute signature exposures without dividing mutations into time points (see "Computing overall signature exposures" section).
 
+2) Please note that at every step if you stop the script and re-start it, the computations will *continue* instead of re-writing the previous results. It is useful for launching large batches of samples: scripts can be paused when needed; if one sample fails, other samples don't need to be re-computed again. However, if you wish some results to be re-computed, please erase the corresponding directory with the results.
 
 
 
