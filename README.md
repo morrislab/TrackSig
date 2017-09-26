@@ -102,7 +102,8 @@ Rscript src/compute_mutational_signatures.R
 
 Results can be found in "results_signature_trajectories" folder (by default, specified in by DIR_RESULTS in `src/header.R`) in appropriate cancer type and tumor id folders. Signature trajectories are stored in `mixtures.csv`. Rows correspond to signatures. Columns correspond to time points. The columns are named by the average cellular prevalence that corresponds to the time point.
 
-If you wish to compute uncertainty for trajectories as well, set `compute_bootstrap parameter` in `src/header.R` to TRUE before running the script (slows down the computation).
+### Estimating uncertainty
+If you wish to compute uncertainty for trajectories as well, set `compute_bootstrap` parameter in `src/header.R` to TRUE before running the script (slows down the computation).
 
 ## Other functionality
 
