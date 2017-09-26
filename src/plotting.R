@@ -140,12 +140,12 @@ plot_signatures <- function (dd, plot_name, phis = NULL, fitted_data = NULL, mar
     labels=paste(round(phis,2),sep = "\n")
 
     # if there are too many time points, display only every other value
-    if (length(col_names) > 60) {
+    if (length(col_names) > 50) {
         # Display every forth label
         labels[seq(2,length(labels),4)] <- ""
         labels[seq(3,length(labels),4)] <- ""
         labels[seq(4,length(labels),4)] <- ""
-    } else if (length(col_names) > 35) {
+    } else if (length(col_names) > 25) {
         # Display every third label
         labels[seq(2,length(labels),3)] <- ""
         labels[seq(3,length(labels),3)] <- ""
@@ -236,16 +236,6 @@ plot_signatures <- function (dd, plot_name, phis = NULL, fitted_data = NULL, mar
   
   return(list(plot = g, data = df))
 }
-
-
-get_group_colors_all_sigs <- function() {
-  popular = c("1","8", "5","40","18","9")
-  group.colors = c(gg_color_hue(length(popular)), sample(gg_color_hue(ncol(alex) - length(popular)),ncol(alex)- length(popular)))
-  names(group.colors) <- c(popular, setdiff(colnames(alex), popular))
-  return(group.colors)
-}
-
-
 
 
 plot_signatures_real_scale <- function (dd, plot_name, phis = NULL, fitted_data = NULL, mark_max_signature=F, mark_change_points=F, 
@@ -359,7 +349,6 @@ plot_signatures_real_scale <- function (dd, plot_name, phis = NULL, fitted_data 
       size = 1.5
     }
   }
-  group.colors = get_group_colors_all_sigs()
 
   g <- ggplot(data = df.m, aes(x = variable, y = value, group = Signatures, color = Signatures)) + 
    geom_line(alpha=alpha, size=1.7) + xlab("Avg number of mutant alleles per cancer cell") + ylab(ytitle) + 

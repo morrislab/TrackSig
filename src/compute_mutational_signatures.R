@@ -18,7 +18,6 @@ save_data_for_samples <- function(dir_counts = DIR_COUNTS,  bootstrap_counts = B
   for (example in examples_group)
   {
     print(paste0("Example ", example, " (", which(examples_group == example), " out of ", length(examples_group), ")"))    
-    pct <- proc.time()
     
       list[tumor_id, vcfData, phis, assigns_phylo_nodes, acronym, dir_name] <- extract_data_for_example(example, dir_counts, tumortypes, dir_create = F)
 
@@ -130,8 +129,6 @@ compute_signatures_for_all_examples <- function(dir_counts = DIR_COUNTS)
     set.seed(which(examples_group == example))
     print(paste0("Example ", example, " (", which(examples_group == example), " out of ", length(examples_group), ")"))
     
-    pct <- proc.time()
-    
     data_file = paste0(SAVED_SAMPLES_DIR, "/", example, ".RData")
     if (file.exists(data_file))
     {
@@ -213,7 +210,6 @@ compute_signatures_for_all_examples <- function(dir_counts = DIR_COUNTS)
     
     mixtures.rescaled = NULL
   
-    print(proc.time() - pct)
     print(paste("Computed example", example))
   }
  
@@ -231,8 +227,6 @@ compute_errorbars_for_all_examples <- function(bootstrap_counts = BOOTSTRAP_COUN
   {
     set.seed(which(examples_group == example))
     print(paste0("Example ", example, " (", which(examples_group == example), " out of ", length(examples_group), ")"))
-
-    pct <- proc.time()
     
     data_file = paste0(SAVED_SAMPLES_DIR, "/", example, ".RData")
     if (file.exists(data_file)) {
@@ -291,31 +285,18 @@ compute_errorbars_for_all_examples <- function(bootstrap_counts = BOOTSTRAP_COUN
     {
       plot_name <- paste0(dir_name, "/", acronym, "_", data_method, "_multMix_fittedPerTimeSlice_", sig_amount, "_noPrior_", method_name, postfix)
     }
-    plot_signatures(mixtures*100, plot_name=paste0(plot_name, ".error_bars.pdf"), 
-                        phis = phis_for_plot, mark_change_points=F, change_points=changepoints, 
-                       #assigns_phylo_nodes = assigns_phylo_nodes_sw, 
-                       transition_points = transition_points,
-                       error_bars = mixtures.err*100)
     
     plot_signatures(mixtures.mean*100, plot_name=paste0(plot_name, ".mean.bootstrap_traj.pdf"), phis = phis_for_plot, 
-                    mark_change_points=T, 
-                    change_points=changepoints, transition_points = transition_points)
+                    transition_points = transition_points,
+                    fitted_data = lapply(mixtures_bootstrap, function(x) x* 100))
                     #assigns_phylo_nodes = assigns_phylo_nodes_sw) #error_bars = mixtures.err)
-    
-    p <- plot_signatures(mixtures.mean*100, plot_name="", phis = phis_for_plot, 
-                      mark_change_points=T, change_points=changepoints, save=F,
-                      transition_points = transition_points)$plot   
-                     #assigns_phylo_nodes = assigns_phylo_nodes_sw) #error_bars = mixtures.err)
-
-    g <- add_change_point_distribution(p, changepoints_bootstrap, ncol(mixtures), (max(mixtures) + 0.05)*100, paste0(plot_name, ".mean.cp_distr.pdf"))
 
     plot_signatures_real_scale(mixtures.mean*100, plot_name=paste0(plot_name, ".mean.bootstrap_traj.all.pdf"), 
                                phis = phis_for_plot, mark_change_points=T, change_points=changepoints_bootstrap,     
                                #assigns_phylo_nodes = assigns_phylo_nodes_sw, #error_bars = mixtures.err,
                                transition_points = transition_points,
-                               fitted_data = lapply(mixtures_bootstrap, function(x) x* 100), remove_sigs_below = 3)
+                               fitted_data = lapply(mixtures_bootstrap, function(x) x* 100), remove_sigs_below = 0)
 
-    print(proc.time() - pct)
     print(paste("Computed example", example))
   }
 }
