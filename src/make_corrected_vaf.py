@@ -11,6 +11,7 @@ import argparse
 # Requires PyVCF. To install: pip2 install pyvcf
 import vcf
 import csv
+import random
 from collections import defaultdict
 import numpy as np
 from scipy.stats import beta

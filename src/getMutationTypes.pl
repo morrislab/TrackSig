@@ -130,7 +130,7 @@ while ($line = <VCFFILE>)
     	{
     		$checkChr++;
     	}
-    	elsif (isdigit($chr))
+    	elsif ($chr =~ /^\d+?$/)
     	{
     		if (($chr > 0) and ($chr < 23))
     		{
