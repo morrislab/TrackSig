@@ -88,6 +88,7 @@ mut_order_file=$mut_order_path/$tumor_id.${tumor_part}mut_order.txt
 if [ ! -f $mutation_types_file ] || [ ! -s  $mutation_types_file ]; then
 	echo "Type file..."
 	perl $get_mutation_type_script muse $vcf_file $phi_file  $mut_order_file >> $mutation_types_file #2>> $log_dir/log.txt
+	rc=$?; if [[ $rc != 0 ]]; then exit $rc; fi
 fi
 
 if [ ! -f $mutation_types_file ] || [ ! -s  $mutation_types_file ]; then
@@ -110,6 +111,7 @@ if [ ! -f $mutation_counts_file ]; then
 			if [ $num_mutations -ge $((i*100-1)) ]; then 
 					###echo $i $((i*100-1))
 				python $make_hundreds_script $mutation_types_file  $((i*100-100)) $((i*100-1)) >> $mutation_counts_file #2>>$log_dir/log.txt
+				rc=$?; if [[ $rc != 0 ]]; then exit $rc; fi
 				fi
 		done
 	fi 
@@ -146,6 +148,7 @@ if [ "$do_bootstrap" = true ] ; then
 			else
 			    # echo "Bootstrap mutations..."
 				python $bootstrap_mutations_script $mutation_types_file  $num_mutations  > $mutation_bootstrap_file_unsorted #2>>$log_dir/log.txt
+				rc=$?; if [[ $rc != 0 ]]; then exit $rc; fi
 		
 				sort -k3 -nr $mutation_bootstrap_file_unsorted > $mutation_bootstrap_file
 		fi
@@ -156,6 +159,7 @@ if [ "$do_bootstrap" = true ] ; then
 			for t in `seq 1 $num_hundreds`; do
 				if [ $num_mutations -ge $((t*100-1)) ]; then
 					python $make_hundreds_script $mutation_bootstrap_file  $((t*100-100)) $((t*100-1)) >> $mutation_bootstrap_counts_file #2>>$log_dir/log.txt
+					rc=$?; if [[ $rc != 0 ]]; then exit $rc; fi
 				fi
 			done
 		fi
