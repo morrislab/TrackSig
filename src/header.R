@@ -40,6 +40,9 @@ DIR_RESULTS = "results_signature_trajectories/"
 # file with signatures definitions
 signature_file = "annotation/alexSignatures.txt"
 
+# file with trinucleotide context
+trinucleotide_file = "annotation/trinucleotide.txt"
+
 # specifies active signatures in TCGA cancer types
 active_signatures_file = "annotation/active_signatures_transposed.txt"
 

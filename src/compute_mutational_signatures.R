@@ -121,7 +121,7 @@ compute_signatures_for_all_examples <- function(dir_counts = DIR_COUNTS)
 
   examples_group <- get_examples_group(tumors, EXAMPLES_PER_GROUP, group)
   
-  mutation_types <- read.delim("annotation/trinucleotide.txt", header=F)
+  mutation_types <- read.delim(trinucleotide_file, header=F)
   mutation_types <- paste(mutation_types[,1], mutation_types[,2], mutation_types[,3], sep="_")
 
   for (example in examples_group)
@@ -287,12 +287,14 @@ compute_errorbars_for_all_examples <- function(bootstrap_counts = BOOTSTRAP_COUN
     }
     
     plot_signatures(mixtures.mean*100, plot_name=paste0(plot_name, ".mean.bootstrap_traj.pdf"), phis = phis_for_plot, 
+                    mark_change_points=T,
+-                   change_points=changepoints,
                     transition_points = transition_points,
                     fitted_data = lapply(mixtures_bootstrap, function(x) x* 100))
                     #assigns_phylo_nodes = assigns_phylo_nodes_sw) #error_bars = mixtures.err)
 
     plot_signatures_real_scale(mixtures.mean*100, plot_name=paste0(plot_name, ".mean.bootstrap_traj.all.pdf"), 
-                               phis = phis_for_plot, mark_change_points=T, change_points=changepoints_bootstrap,     
+                               phis = phis_for_plot, mark_change_points=T, change_points=changepoints_bootstrap, 
                                #assigns_phylo_nodes = assigns_phylo_nodes_sw, #error_bars = mixtures.err,
                                transition_points = transition_points,
                                fitted_data = lapply(mixtures_bootstrap, function(x) x* 100), remove_sigs_below = 0)

@@ -62,6 +62,7 @@ plotPhiSignatures <- function(map_only_known_signatures = FALSE) {
 plot_signatures <- function (dd, plot_name, phis = NULL, fitted_data = NULL, mark_max_signature=F, mark_change_points=F, 
                              change_points=NULL, error_bars = NULL, save=T,
                              assigns_phylo_nodes = NULL, scale = 1, ytitle = "Signature exposure (%)",
+                             xtitle = "Avg number of mutant alleles per cancer cell",
                              transition_points = NULL,
                              remove_sigs_below = 0,
                              sig_colors = NULL) {
@@ -123,7 +124,7 @@ plot_signatures <- function (dd, plot_name, phis = NULL, fitted_data = NULL, mar
   }
 
   g <- ggplot(data = df.m, aes(x = variable, y = value , group = Signatures, color = Signatures)) + 
-    geom_line(alpha=alpha, size=size) + xlab("Avg number of mutant alleles per cancer cell") + ylab(ytitle) + 
+    geom_line(alpha=alpha, size=size) + xlab(xtitle) + ylab(ytitle) + 
     geom_point(alpha=alpha, size=size) + 
     theme_bw() + theme(text = element_text(size = 20)) +
     theme(axis.title = element_text(size = 20)) + 
@@ -188,15 +189,13 @@ plot_signatures <- function (dd, plot_name, phis = NULL, fitted_data = NULL, mar
     if (is.null(change_points))
       stop("Please provide change points to mark in the plot")
     
-    #g <- g + geom_vline(xintercept = change_points, size = 0.7)
-    if (is.null(change_points))
-      stop("Please provide change points to mark in the plot")
-    
     #g <- g + geom_vline(xintercept = change_points, size = 1, show.legend = T)
 
-    for (i in 1:length(change_points)) {
-      g <- g +  annotate("rect", xmax=change_points[i]-1, 
-          xmin=change_points[i], ymin=-Inf, ymax=Inf, alpha=0.3) 
+    if (length(change_points) > 0) {
+      for (i in 1:length(change_points)) {
+        g <- g +  annotate("rect", xmax=change_points[i]-1, 
+            xmin=change_points[i], ymin=-Inf, ymax=Inf, alpha=0.3) 
+      }
     }
 
   }
@@ -240,6 +239,7 @@ plot_signatures <- function (dd, plot_name, phis = NULL, fitted_data = NULL, mar
 
 plot_signatures_real_scale <- function (dd, plot_name, phis = NULL, fitted_data = NULL, mark_max_signature=F, mark_change_points=F, 
                              change_points=NULL, error_bars = NULL, save=T, ytitle = "Signature exposure (%)",
+                             xtitle = "Avg number of mutant alleles per cancer cell",
                              assigns_phylo_nodes = NULL,  transition_points = NULL, remove_sigs_below = 0, cut_at_range = NULL, sig_colors = NULL) {
   if (!is.null(error_bars) & sum(dim(dd) == dim(error_bars)) != 2) {
     stop("Dimentions of error bar matrix should be the same as dimentions of mixture matrix")
@@ -351,7 +351,7 @@ plot_signatures_real_scale <- function (dd, plot_name, phis = NULL, fitted_data 
   }
 
   g <- ggplot(data = df.m, aes(x = variable, y = value, group = Signatures, color = Signatures)) + 
-   geom_line(alpha=alpha, size=1.7) + xlab("Avg number of mutant alleles per cancer cell") + ylab(ytitle) + 
+   geom_line(alpha=alpha, size=1.7) + xlab(xtitle) + ylab(ytitle) + 
     geom_point(alpha=alpha, size=1.7) + 
     theme_bw() + theme(text = element_text(size = 20)) +
     theme(axis.title = element_text(size = 20)) + 
@@ -421,6 +421,7 @@ plot_signatures_real_scale <- function (dd, plot_name, phis = NULL, fitted_data 
     #g <- g + geom_vline(xintercept = change_points, size = 1, show.legend = T)
 
       # if change points are in the list from various bootstrap runs, show all of them and adjust transparency
+    if (length(change_points) > 0) {
       if (class(change_points) == "list") {
           alpha = 0.5/length(change_points)
           change_points <- unlist(change_points)
@@ -430,6 +431,7 @@ plot_signatures_real_scale <- function (dd, plot_name, phis = NULL, fitted_data 
       for (i in 1:length(change_points)) {
         g <- g +  annotate("rect", xmin=round(phis,3 )[change_points[i]-1], xmax=round(phis,3 )[change_points[i]], ymin=-Inf, ymax=Inf, alpha=alpha) 
       }
+    }
   }
   
   if (!is.null(error_bars)) {

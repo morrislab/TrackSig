@@ -755,7 +755,7 @@ truncate_to_range <- function(mixtures, range_) {
 
   x2 <- x[,to_leave, drop=F]
   colnames(x2) <- col_names[to_leave]
-  return(x2)
+  return(list(x2,to_leave))
 }
 
 load_annotation <- function(tumortype_file, signature_file, active_signatures_file) {
