@@ -179,7 +179,7 @@ compute_signatures_for_all_examples <- function(dir_counts = DIR_COUNTS)
     
     if (!file.exists(paste0(dir_name, "mixtures.csv")) || !file.exists(paste0(dir_name, "changepoints.txt")))
     {
-      list[bics, optimal, changepoints, mixtures] <- find_changepoints_over_all_signatures_one_by_one(vcf, alex.t)
+      list[bics, optimal, changepoints, mixtures] <- find_changepoints_over_all_signatures_one_by_one(vcf, alex.t, n_signatures = ncol(alex.t))
       
       write.csv(mixtures, file=paste0(dir_name, "mixtures.csv"))
       write(changepoints, file=paste0(dir_name, "changepoints.txt"), ncolumns=length(changepoints))
@@ -288,7 +288,7 @@ compute_errorbars_for_all_examples <- function(bootstrap_counts = BOOTSTRAP_COUN
     
     plot_signatures(mixtures.mean*100, plot_name=paste0(plot_name, ".mean.bootstrap_traj.pdf"), phis = phis_for_plot, 
                     mark_change_points=T,
--                   change_points=changepoints,
+                    change_points=changepoints,
                     transition_points = transition_points,
                     fitted_data = lapply(mixtures_bootstrap, function(x) x* 100))
                     #assigns_phylo_nodes = assigns_phylo_nodes_sw) #error_bars = mixtures.err)

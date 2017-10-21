@@ -74,7 +74,7 @@ get_changepoints_matrix_jointly <- function(data, lambda_type="lambda.1se")
 # The next change point is the one which gives lowest bic.
 # To correctly evaluate the model using BIC criteria, 
 # we pass n_params -- the number of ther params of the model, besides number of checkpoints
-find_changepoints_over_all_signatures_one_by_one <- function(vcf, alex.t, n_params = 0, parallelized=F)
+find_changepoints_over_all_signatures_one_by_one <- function(vcf, alex.t, n_signatures, parallelized=F)
 {
   overall_mixtures <- fit_mixture_of_multinomials_EM(apply(vcf, 1, sum), as.matrix(alex.t))
   overall_mixtures.table <- matrix(rep(overall_mixtures, ncol(vcf)), ncol=ncol(vcf))
@@ -98,7 +98,7 @@ find_changepoints_over_all_signatures_one_by_one <- function(vcf, alex.t, n_para
     mixtures <- next_cp$mixtures
     ll <- next_cp$ll
    
-    bic[[t]] <- -2 * ll + (length(changepoints) + n_params) * log(sum(vcf))
+    bic[[t]] <- -2 * ll + (length(changepoints)+1)*(n_signatures + 1) * log(sum(vcf))
     changepoints_per_iteration[[t]] <- changepoints
     mixtures_per_iteration[[t]] <- mixtures
     print(paste("New changepoints", toString(changepoints)))
@@ -237,7 +237,7 @@ find_changepoints_and_signature_set <- function(vcf, alex.t, prior_signatures = 
   
   sig_set <- prior_signatures
   alex.t.set <- alex.t[,sig_set]
-  list[baseline_bics, optimal, changepoints, mixtures] <- find_changepoints_over_all_signatures_one_by_one(vcf, alex.t.set, n_params=length(sig_set))
+  list[baseline_bics, optimal, changepoints, mixtures] <- find_changepoints_over_all_signatures_one_by_one(vcf, alex.t.set, n_signatures=length(sig_set))
   baseline_min <- baseline_bics[optimal]
   print(paste("Initial baseline:", baseline_min))
   old_changepoints <- c()
@@ -266,7 +266,7 @@ find_changepoints_and_signature_set <- function(vcf, alex.t, prior_signatures = 
         }
         ll <- sum(log_prob_per_timepoint)
   
-        bic <- -2 * ll + (length(changepoints) + length(current_sig_set)) * log(sum(vcf))
+        bic <- -2 * ll + ((length(changepoints)+1) * (length(current_sig_set)-1)) * log(sum(vcf))
 #         list[bic, optimal, changepoints, mixtures] <- find_changepoints_over_all_signatures_one_by_one(vcf, alex.t.set, n_params=length(current_sig_set), parallelized=F)
 #         bic <- bic[optimal]
         setNames(bic, sig)
@@ -340,7 +340,7 @@ find_changepoints_and_signature_set <- function(vcf, alex.t, prior_signatures = 
     old_changepoints <- changepoints
     
     alex.t.set <- alex.t[,sig_set]
-    list[bics, optimal, changepoints, mixtures] <- find_changepoints_over_all_signatures_one_by_one(vcf, alex.t.set, n_params=length(sig_set))
+    list[bics, optimal, changepoints, mixtures] <- find_changepoints_over_all_signatures_one_by_one(vcf, alex.t.set, n_signatures=length(sig_set))
     print(paste("Old baseline: ", baseline_min))
     baseline_min <- bics[optimal]
     print(paste("New baseline: ", baseline_min))
