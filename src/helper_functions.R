@@ -710,7 +710,7 @@ get_bootstrap_mixtures <- function(bootstrap_vcfs, bootstrap_phis, alex.t, dir_n
     }
     if (!file.exists(paste0(dir_name,"mixtures.bootstrap_", j, descr, ".csv")) | !file.exists(paste0(dir_name, "changepoints.bootstrap_", j, descr, ".txt")))
     {
-      list[bics, optimal, cp, m] <- find_changepoints_over_all_signatures_one_by_one(bootstrap_vcfs[[j]], alex.t)
+      list[bics, optimal, cp, m] <- find_changepoints_over_all_signatures_one_by_one(bootstrap_vcfs[[j]], alex.t, n_signatures = ncol(alex.t))
       write.csv(m, file=paste0(dir_name, "mixtures.bootstrap_", j, descr, ".csv"))
       write(cp, file=paste0(dir_name, "changepoints.bootstrap_", j, descr, ".txt"), ncolumns=length(cp))
       
