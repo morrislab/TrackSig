@@ -154,6 +154,8 @@ Signatures provided in the repo are from [COSMIC](http://cancer.sanger.ac.uk/cos
 
 2) **Results are not re-computed when script is re-started.** Please note that at every step if you stop the script and re-start it, the computations will *continue* instead of re-writing the previous results. It is useful for launching large batches of samples: scripts can be paused when needed; if one sample fails, other samples don't need to be re-computed again. However, if you wish some results to be re-computed, please erase the corresponding directory.
 
+3) **If the tumour names contain a dot, please replace it with another symbol, for example, with underscore.**
+
 
 
 
