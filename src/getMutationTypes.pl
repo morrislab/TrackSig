@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 # Make mutation counts by 100 from vcf and phi file. Also script dumps the ordered mutations into MutOrderFile (useful to reorder mutation assignments in the same order).
 
-# AUTHOR: Amit Deshwar
+# AUTHOR: Nil Sahin
 
 use strict;
 use warnings;
