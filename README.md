@@ -1,4 +1,4 @@
-# Trackature
+# Trackature (TrackSig)
 
 A framework to infer mutational signatures over time.
 
