@@ -179,15 +179,26 @@ compute_signatures_for_all_examples <- function(dir_counts = DIR_COUNTS)
     
     if (!file.exists(paste0(dir_name, "mixtures.csv")) || !file.exists(paste0(dir_name, "changepoints.txt")))
     {
-      list[bics, optimal, changepoints, mixtures] <- find_changepoints_over_all_signatures_one_by_one(vcf, alex.t, n_signatures = ncol(alex.t))
-      
+      if (changepoint_method == "PELT") {
+        list[changepoints, mixtures] <- find_changepoints_pelt(vcf, alex.t)
+      } else {
+        list[bics, optimal, changepoints, mixtures] <- find_changepoints_over_all_signatures_one_by_one(vcf, alex.t, n_signatures = ncol(alex.t))
+      }
+
       write.csv(mixtures, file=paste0(dir_name, "mixtures.csv"))
-      write(changepoints, file=paste0(dir_name, "changepoints.txt"), ncolumns=length(changepoints))
+
+      n_col <- ifelse(length(changepoints) > 0, length(changepoints), 1)
+      write(changepoints, file=paste0(dir_name, "changepoints.txt"), ncolumns=n_col)
     } else {
       mixtures <- read_mixtures(paste0(dir_name, "mixtures.csv"))
-      changepoints <- unlist(read.table(paste0(dir_name, "changepoints.txt"), header=F))
+      cp_file = paste0(dir_name, "changepoints.txt")
+      if (file.info(cp_file)$size == 1) {
+        changepoints <- c()
+      } else {
+        changepoints <- unlist(read.table(cp_file, header=F))
+      }
     }
-    
+
     if (!is.null(assigns_phylo_nodes_sw)) {
       write(assigns_phylo_nodes_sw,  file=paste0(dir_name, "assignments.txt"), ncolumns=length(assigns_phylo_nodes_sw))
     } else  {
@@ -203,7 +214,8 @@ compute_signatures_for_all_examples <- function(dir_counts = DIR_COUNTS)
       plot_name <- paste0(dir_name, "/", acronym, "_", data_method, "_multMix_fittedPerTimeSlice_", sig_amount, "_noPrior_", method_name, postfix, ".pdf")
     }
 
-    plot_signatures(mixtures*100, plot_name=plot_name, phis = phis_for_plot, mark_change_points=T, change_points=changepoints, 
+    mark_cp <- !is.null(changepoints)
+    plot_signatures(mixtures*100, plot_name=plot_name, phis = phis_for_plot, mark_change_points=mark_cp, change_points=changepoints, 
                     #assigns_phylo_nodes = assigns_phylo_nodes_sw, 
                     transition_points = transition_points,
                     scale=1.2)
@@ -272,8 +284,10 @@ compute_errorbars_for_all_examples <- function(bootstrap_counts = BOOTSTRAP_COUN
       next
     }   
     mixtures <- read_mixtures(paste0(dir_name, "mixtures.csv"))
-    changepoints <- unlist(read.table(paste0(dir_name, "changepoints.txt"), header=F))
-    
+    changepoints <- tryCatch({
+      unlist(read.table(paste0(dir_name, "changepoints.txt"), header=F))
+    }, error = function(e){return()})
+
     print("Computing bootstrapped trajectories")
     list[mixtures_bootstrap, changepoints_bootstrap] <- get_bootstrap_mixtures(bootstrap_vcfs, bootstrap_phis, alex.t, dir_name, "")
     list[mixtures.mean, mixtures.sd, mixtures.err] <- compute_mean_sd_err(mixtures_bootstrap, rownames(mixtures), dir_name)
@@ -285,7 +299,7 @@ compute_errorbars_for_all_examples <- function(bootstrap_counts = BOOTSTRAP_COUN
     {
       plot_name <- paste0(dir_name, "/", acronym, "_", data_method, "_multMix_fittedPerTimeSlice_", sig_amount, "_noPrior_", method_name, postfix)
     }
-    
+
     plot_signatures(mixtures.mean*100, plot_name=paste0(plot_name, ".mean.bootstrap_traj.pdf"), phis = phis_for_plot, 
                     mark_change_points=T,
                     change_points=changepoints,

@@ -354,3 +354,95 @@ find_changepoints_and_signature_set <- function(vcf, alex.t, prior_signatures = 
 
   return(list(bics, optimal, changepoints, mixtures))
 }
+
+# Find optimal changepoint and mixtures using PELT method.
+find_changepoints_pelt <- function(vcf, alex.t)
+{
+  score_matrix <- score_partitions_pelt(vcf, alex.t)
+  changepoints <- recover_changepoints(score_matrix)
+
+  mixtures <- fit_mixture_of_multinomials_in_time_slices(vcf, changepoints, alex.t)
+
+  return(list(changepoints = changepoints, mixtures = mixtures))
+}
+
+# Calculate penalized BIC score for all partitions using PELT method.
+score_partitions_pelt <- function(vcf, alex.t)
+{
+  n_bins <- ncol(vcf)
+  n_sigs <- ncol(alex.t)
+
+  # Bayeisan Information Criterion penalization constant
+  penalty <- (n_sigs - 1) * log(n_bins)
+
+  # Store score for all partitions of all sub-problems
+  # Rows are length of sub-problem. Columns correspond to last changepoint
+  sp_scores <- matrix(nrow=n_bins, ncol=n_bins)
+
+  max_sp_scores <- numeric(n_bins)
+  prune_set <- c()
+
+  # Score all subproblems of length sp_len using last_cp as last changepoint
+  for (sp_len in 1:n_bins)
+  {
+  	valid_cps <- setdiff(0:(sp_len - 1), prune_set)
+    print(paste0("Scoring subpartitions of length: ", sp_len, "/", n_bins))
+    for (last_cp in valid_cps)
+    {
+      # Segments with length less than 4 cannot be accurately scored
+      if (sp_len - last_cp < 4)
+      {
+        sp_scores[sp_len, last_cp + 1] <- -Inf
+        next
+      }
+
+      r_seg_counts <- rowSums(vcf[, (last_cp + 1):sp_len, drop = FALSE])
+      r_seg_mix <- fit_mixture_of_multinomials_EM(r_seg_counts, alex.t)
+      r_seg_score <- 2 * log_likelihood_mixture_multinomials(r_seg_counts, alex.t, r_seg_mix)
+
+      l_seg_score <- ifelse(last_cp == 0, penalty, max_sp_scores[last_cp])
+
+      sp_scores[sp_len, last_cp + 1] <- l_seg_score + r_seg_score - penalty
+    }
+
+    max_sp_scores[sp_len] <- max(sp_scores[sp_len, ][!is.na(sp_scores[sp_len, ])])
+
+    # Evaluate all changepoints for pruning condition
+    for (cp in valid_cps)
+    {
+      if (sp_len - cp < 4)
+      {
+        next
+      }
+
+      if (sp_scores[sp_len, cp + 1] + penalty < max_sp_scores[sp_len])
+      {
+        prune_set <- c(prune_set, cp)
+      }
+    }
+  }
+  return(sp_scores)
+}
+
+# Recover optimal changepoints by from subproblem matrix
+recover_changepoints <- function(sp_score_matrix)
+{
+  changepoints <- c()
+
+  continue <- TRUE
+  current <- dim(sp_score_matrix)[1]
+  while (continue)
+  {
+    prev <- which.max(sp_score_matrix[current, ])
+    if (prev - 1 <= 1)
+    {
+      continue <- FALSE
+    } 
+    else
+    {
+      changepoints <- c(prev - 1, changepoints)
+    }
+    current <- prev - 1
+  }
+  return(changepoints)
+}

@@ -162,13 +162,14 @@ fit_mixture_of_multinomials_in_time_slices <- function(data, change_points, alex
   # Get first time slice until the first check point and get sum of it
   if (length(change_points) == 0) {
     end_of_first_slice <- ncol(data)
+    slice_indices <- 1:(end_of_first_slice)
   } else {
     end_of_first_slice <- change_points[1]
+    slice_indices <- 1:(end_of_first_slice-1)
   }
-  
+
   d <- list()
-  
-  slice_indices <- 1:(end_of_first_slice-1)
+
   d[[1]] <- list()
   d[[1]]$data <-  toVerticalMatrix(data[,slice_indices])
   d[[1]]$slice_indices <- slice_indices
