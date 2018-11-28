@@ -28,6 +28,9 @@ simulated_data = FALSE
 
 postfix = ""
 
+# specifies the changepoint detection algorithm.
+changepoint_method = "PELT"
+
 # file with cancer types of each sample
 tumortype_file <- "data/tumortypes.txt"
 
@@ -80,4 +83,3 @@ for (file in src_files)
 
 list[alex, tumortypes, active_signatures, active_signatures.our_samples] <- 
     load_annotation(tumortype_file, signature_file, active_signatures_file)
-

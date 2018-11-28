@@ -107,17 +107,17 @@ If you wish to compute uncertainty for trajectories as well, set `compute_bootst
 
 ## Other functionality
 
-### Computing overall signature exposures across all mutations
+### Computing overall signature activities across all mutations
 
-Mean signature exposures across all mutations in the tumor can be computed the following way:
+Mean signature activities across all mutations in the tumor can be computed the following way:
 ```
 R
 source("src/header.R")
 compute_overall_exposures_for_all_examples()
 ```
-It will compute the signature exposures (aka "mixtures") for all samples in the data/counts directory. The results can be found in the results directory under the appropriate cancer type and tumor ID ( `overall_mixtures.csv`).
+It will compute the signature activities (aka "mixtures") for all samples in the data/counts directory. The results can be found in the results directory under the appropriate cancer type and tumor ID ( `overall_mixtures.csv`).
 
-Alternatively, you can call a function to compute exposures directly:
+Alternatively, you can call a function to compute activities directly:
 ```
 mixtures <- fit_mixture_of_multinomials_EM(mutation_counts, alex.t)
 ```
@@ -134,7 +134,7 @@ To use cancer-type specific signatures, please provide `data/tumortypes.txt` fil
 
 **Estimating active signatures from scratch**
 
-If active signatures are unavailable, they can be estimated by computing mean exposures across all mutations (see "Computing overall signature exposures" section) and taking the signatures with highest exposures (for example, with exposure > 10%). Next, these signatures should be specified as active in `src/header.R` before running `src/compute_mutational_signatures.R`. 
+If active signatures are unavailable, they can be estimated by computing mean activities across all mutations (see "Computing overall signature activities" section) and taking the signatures with highest activities (for example, with activity > 10%). Next, these signatures should be specified as active in `src/header.R` before running `src/compute_mutational_signatures.R`. 
 
 We recommmend to estimate active signatures first (as described above) instead of fitting all signatures over time through Trackature, as it provides more stable results and speeds up the computation.
 
@@ -150,7 +150,7 @@ To specify a separate set of active signatures for each sample:
 Signatures provided in the repo are from [COSMIC](http://cancer.sanger.ac.uk/cosmic/signatures) located in `annotation/alexSignatures.txt`. You can use your own signatures by providing path to another signature file through `signature_file` parameter in `src/header.R`.
 
 ## Important notes
-1) **Is not applicable for samples with <600 mutations.** Please note that Trackature does not run on samples with less than 600 mutations. Less than 600 mutations will result in less than 3 time points, and there is no point to analize it as a time series. On tumors with less than 600 mutations, you can compute signature exposures without dividing mutations into time points (see "Computing overall signature exposures" section).
+1) **Is not applicable for samples with <600 mutations.** Please note that Trackature does not run on samples with less than 600 mutations. Less than 600 mutations will result in less than 3 time points, and there is no point to analize it as a time series. On tumors with less than 600 mutations, you can compute signature activities without dividing mutations into time points (see "Computing overall signature activities" section).
 
 2) **Results are not re-computed when script is re-started.** Please note that at every step if you stop the script and re-start it, the computations will *continue* instead of re-writing the previous results. It is useful for launching large batches of samples: scripts can be paused when needed; if one sample fails, other samples don't need to be re-computed again. However, if you wish some results to be re-computed, please erase the corresponding directory.
 

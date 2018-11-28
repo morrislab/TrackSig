@@ -710,14 +710,19 @@ get_bootstrap_mixtures <- function(bootstrap_vcfs, bootstrap_phis, alex.t, dir_n
     }
     if (!file.exists(paste0(dir_name,"mixtures.bootstrap_", j, descr, ".csv")) | !file.exists(paste0(dir_name, "changepoints.bootstrap_", j, descr, ".txt")))
     {
-      list[bics, optimal, cp, m] <- find_changepoints_over_all_signatures_one_by_one(bootstrap_vcfs[[j]], alex.t, n_signatures = ncol(alex.t))
+      if (changepoint_method == "PELT") {
+        list[cp, m] <- find_changepoints_pelt(t(bootstrap_vcfs[[j]]), alex.t)
+      } else {
+        list[bics, optimal, cp, m] <- find_changepoints_over_all_signatures_one_by_one(bootstrap_vcfs[[j]], alex.t, n_signatures = ncol(alex.t))
+      }
+
       write.csv(m, file=paste0(dir_name, "mixtures.bootstrap_", j, descr, ".csv"))
-      write(cp, file=paste0(dir_name, "changepoints.bootstrap_", j, descr, ".txt"), ncolumns=length(cp))
-      
+      n_col <- ifelse(length(cp) > 0, length(cp), 1)
+      write(cp, file=paste0(dir_name, "changepoints.bootstrap_", j, descr, ".txt"), ncolumns=n_col)
     } else {
       m <- read_mixtures(paste0(dir_name,"mixtures.bootstrap_", j, descr, ".csv"))
       cp_file = paste0(dir_name, "changepoints.bootstrap_", j, descr, ".txt")
-      if (file.info(cp_file)$size == 0) {
+      if (file.info(cp_file)$size == 1) {
         cp <- c()
       } else {
         cp <- unlist(read.table(paste0(dir_name, "changepoints.bootstrap_", j, descr, ".txt"), header=F))
