@@ -123,7 +123,6 @@ if __name__=="__main__":
 
 	# input srguments
 	parser = argparse.ArgumentParser(description="Generate random data")
-	parser.add_argument("-dis", help="choose a distribution from ['constant', 'random'], default=random", default="random")
 	parser.add_argument("--timepoints", help="number of time points", default=50)
 	parser.add_argument("-s", "--sig-file", help="File with mutational signature definitions", 
 		default="annotation/alexSignatures_w_header.csv")
@@ -162,7 +161,7 @@ if __name__=="__main__":
 		file_name = "./simulated_data/"+"_".join(sig_comb[2:])+ "_" + str(change_points)
 
 		random = RandomData(change_points, time_points, sig_comb)
-		exposure = random._generate_e_i(args.dis)
+		exposure = random._generate_e_i("random")
 
 		exposures_with_sig_names = np.concatenate((np.expand_dims(np.asarray(sig_comb),axis=1), exposure),axis = 1)
 		np.savetxt(file_name+".exposure.csv",exposures_with_sig_names, delimiter=",", fmt="%s")
