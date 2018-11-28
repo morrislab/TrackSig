@@ -1,4 +1,5 @@
 # AUTHOR: Yulia Rubanova
+# 2018
 
 options( expressions = 5e5 )
 
@@ -9,8 +10,8 @@ library(NMF)
 nmf.options(grid.patch=TRUE)
 
 # Select fitting all signatures or only signatures for the particular cancer type
-sig_amount <- "onlyKnownSignatures" # recommended
-#sig_amount <- "allSignatures" # not recommended, time-consuming
+#sig_amount <- "onlyKnownSignatures" # recommended
+sig_amount <- "onlyKnownSignatures" # not recommended, time-consuming
 
 # if the signatures are specified per cancer type or per sample
 cancer_type_signatures = T
@@ -20,19 +21,29 @@ cancer_type_signatures = T
 # warning: by default, mutations are bootstrapped 30 times and the script will run 30 time longer
 compute_bootstrap = FALSE
 
-sliding_window = TRUE
-postfix = ""
+sliding_window = FALSE
 noise_sig = NULL
-rescale_to_age_sigs = FALSE
+
+simulated_data = FALSE
+
+postfix = ""
 
 # file with cancer types of each sample
 tumortype_file <- "data/tumortypes.txt"
 
-# folders with mutation counts, mutation order and bootstrapped mutations
-# don't need to be changed unless different folder were specified in make_counts.sh
-DIR_COUNTS = "data/counts/"
-mutation_order = "data/mut_order/"
-BOOTSTRAP_COUNTS = "data/bootstrap/"
+if (simulated_data) {
+  DIR_COUNTS = "./simulated_data/"
+  mutation_order = NULL
+  BOOTSTRAP_COUNTS = NULL
+  purity_file <- NULL
+} else {
+  # folders with mutation counts, mutation order and bootstrapped mutations
+  # don't need to be changed unless different folder were specified in make_counts.sh
+  DIR_COUNTS = "data/counts/"
+  mutation_order = "data/mut_order/"
+  BOOTSTRAP_COUNTS = "data/bootstrap/"
+  purity_file = "data/example_purity.txt"
+}
 
 # folder to write results to
 DIR_RESULTS = "results_signature_trajectories/"

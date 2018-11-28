@@ -7,11 +7,19 @@ EXAMPLES_PER_GROUP <- 500
 
 save_data_for_samples <- function(dir_counts = DIR_COUNTS,  bootstrap_counts = BOOTSTRAP_COUNTS)
 {
+  print("Step 1: pre-processing")
+
   if (!file.exists(SAVED_SAMPLES_DIR)) {
     dir.create(SAVED_SAMPLES_DIR, recursive = T)
   }
 
-  tumors <- gsub("([^/]*)\\.phi\\.txt","\\1", list.files(dir_counts)) 
+  if (simulated_data) {
+    tumors <- list.files(dir_counts, recursive=T)
+    tumors <- tumors[grepl("([^/]*)\\d\\.csv", tumors)]
+    tumors <- gsub("([^/]*)\\.csv","\\1", tumors) 
+  } else {
+    tumors <- gsub("([^/]*)\\.phi\\.txt","\\1", list.files(dir_counts)) 
+  }
 
   examples_group <- get_examples_group(tumors, EXAMPLES_PER_GROUP, group)
 
@@ -19,7 +27,11 @@ save_data_for_samples <- function(dir_counts = DIR_COUNTS,  bootstrap_counts = B
   {
     print(paste0("Example ", example, " (", which(examples_group == example), " out of ", length(examples_group), ")"))    
     
+    if (simulated_data) {
+      list[tumor_id, vcfData, phis, acronym, dir_name] <- extract_data_for_simulation(example, dir_counts, dir_create = F)
+    } else {
       list[tumor_id, vcfData, phis, assigns_phylo_nodes, acronym, dir_name] <- extract_data_for_example(example, dir_counts, tumortypes, dir_create = F)
+    }
 
     if (is.null(vcfData))
     {
@@ -55,6 +67,10 @@ save_data_for_samples <- function(dir_counts = DIR_COUNTS,  bootstrap_counts = B
       phis_for_plot <- phis_sliding_window <- phis
     }
       
+    if (!simulated_data) {
+      purity = get_sample_purity(example)
+      phis_for_plot = phis_for_plot / purity
+
       if (sum(phis_sliding_window < 0.001) > 0.2 * length(phis_sliding_window))
       {
         phis_for_plot = NULL
@@ -103,6 +119,12 @@ save_data_for_samples <- function(dir_counts = DIR_COUNTS,  bootstrap_counts = B
           }
         }
       }
+    }
+
+    if (simulated_data) {
+      dir.create(paste0(SAVED_SAMPLES_DIR, "/", acronym, "/"), showWarnings=F, recursive=T)
+      assigns_phylo_nodes = assigns_phylo_nodes_sw = bootstrap_vcfs = bootstrap_phis = bootstrap_vcfs_unsorted = NULL
+    }
 
     save(vcfData, vcf, phis, phis_sliding_window, assigns_phylo_nodes, assigns_phylo_nodes_sw, 
          acronym, window, shift, gap, tumor_id, phis_for_plot, bootstrap_vcfs, bootstrap_phis,
@@ -113,11 +135,19 @@ save_data_for_samples <- function(dir_counts = DIR_COUNTS,  bootstrap_counts = B
 
 compute_signatures_for_all_examples <- function(dir_counts = DIR_COUNTS)
 {
+  print("Step 2: computing signature activities")
+
   add_early_late_transition = TRUE
 
   age_signatures <- c("S1", "S5", "L1", "1", "5a", "5b")
 
+  if (simulated_data) {
+    tumors <- list.files(dir_counts, recursive=T)
+    tumors <- tumors[grepl("([^/]*)\\d\\.csv", tumors)]
+    tumors <- gsub("([^/]*)\\.csv","\\1", tumors) 
+  } else {
     tumors <- gsub("([^/]*)\\.phi\\.txt","\\1", list.files(dir_counts)) 
+  }
 
   examples_group <- get_examples_group(tumors, EXAMPLES_PER_GROUP, group)
   
@@ -138,13 +168,22 @@ compute_signatures_for_all_examples <- function(dir_counts = DIR_COUNTS)
       next
     }
 
+    if (simulated_data){
+      active_sigs <- data.frame(tumor_type = acronym, ID = tumor_id, Name = acronym, toHorizontalMatrix(rep(0, ncol(alex))), stringsAsFactors=F)
+      colnames(active_sigs) <- c("tumor_type", "ID", "Name", colnames(alex))
 
+      active <- sapply(read.csv(paste0(DIR_COUNTS, "/", example, ".exposure.csv"), header=F)[,1], toString)
+      active_sigs[,active] <- 1
+
+      list[alex.t, matched_type, acronym] <- get_signatures_for_current_sample(tumor_id, active_sigs, alex, noise_sig)
+    } else {
       if (sig_amount == "onlyKnownSignatures") {
         # Fit only known signatures
         list[alex.t, matched_type, acronym] <- get_signatures_for_current_sample(tumor_id, active_signatures.our_samples, alex, noise_sig)
       } else {
         alex.t <- alex
       }
+    }
 
     if (is.null(acronym) || acronym == "") {
       print(paste("ERROR: Cancer type not found for ", example))
@@ -196,7 +235,11 @@ compute_signatures_for_all_examples <- function(dir_counts = DIR_COUNTS)
 
     age_signatures <- intersect(rownames(mixtures), age_signatures)
 
+    if (simulated_data) {
+      plot_name <- paste0(dir_name, "/", tumor_id,  ".pdf")
+    } else {
       plot_name <- paste0(dir_name, "/", acronym, "_", tumor_id, "_", sig_amount, postfix, ".pdf")
+    }
 
     if (PLOT_FULL_NAME)
     {
@@ -218,6 +261,7 @@ compute_signatures_for_all_examples <- function(dir_counts = DIR_COUNTS)
 
 compute_errorbars_for_all_examples <- function(bootstrap_counts = BOOTSTRAP_COUNTS)
 {
+  print("Step 3: computing signature activities on bootstrapped data (optional)")
   add_early_late_transition = TRUE
 
   tumors <- list.dirs(bootstrap_counts, recursive = F, full.names=F)

@@ -763,7 +763,7 @@ load_annotation <- function(tumortype_file, signature_file, active_signatures_fi
   names_trinucleotide <- apply(names_trinucleotide, 1, function(x) { do.call("paste", c(as.list(x), sep = "_"))})
 
   # Load the tumor types for tumor IDs.
-  tumortypes <- read.delim(tumortype_file, header = F, stringsAsFactors=F)
+  tumortypes <- read.delim(tumortype_file, header = T, stringsAsFactors=F)
   colnames(tumortypes) <- c("ID", "tumor_type")
 
   # ALEX DATA
@@ -772,7 +772,7 @@ load_annotation <- function(tumortype_file, signature_file, active_signatures_fi
   alex <- read.table(paste0(signature_file))
   rownames(alex) <- names_trinucleotide
   colnames(alex) <- paste0("S", 1:ncol(alex))
-  
+
   if (cancer_type_signatures) {
     # Load active signatures for each tumor type
     active_signatures <- read.delim(active_signatures_file, stringsAsFactors=F)
@@ -821,3 +821,17 @@ load_annotation <- function(tumortype_file, signature_file, active_signatures_fi
 
   return(list(alex, tumortypes, active_signatures, active_signatures.our_samples))
 }
+
+get_sample_purity <- function(tumor_id) {
+  purities <-read.delim(purity_file)
+
+  sample_purity = NULL
+  if (!(tumor_id %in% purities$samplename)) {
+    warning(paste("Tumor not found", tumor_id))
+  } else {
+    sample_purity = purities[purities$samplename == tumor_id,]$purity
+  }
+
+  return(sample_purity)
+}
+
