@@ -105,6 +105,27 @@ Results can be found in "results_signature_trajectories" folder (by default, spe
 ### Estimating uncertainty
 If you wish to compute uncertainty for trajectories as well, set `compute_bootstrap` parameter in `src/header.R` to TRUE before running the script (slows down the computation).
 
+## Generating simulations
+```
+python src/generate_simulations.py
+```
+Output: files with simulated mutation counts and true signature activities in simulated_data/ folder
+
+Optional arguments:
+
+`--timepoints` -- number of time points (50 by default)
+
+`--sig-file` -- file with mutational siggnatures ("annotation/alexSignatures_w_header.csv" by default)
+
+The simulations use a different format of mutation counts. If you want to run TrackSig on simulations, be sure to set `simulated_data = TRUE` in `src/header.R`.
+
+Finally, run TrackSig on simulations:
+
+```
+Rscript src/compute_mutational_signatures.R
+```
+    
+
 ## Other functionality
 
 ### Computing overall signature activities across all mutations
