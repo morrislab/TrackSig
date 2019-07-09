@@ -414,11 +414,11 @@ extract_data_for_example <- function (example, dir_counts, tumortypes, dir_resul
       assigns_phylo_nodes_pos <- paste(assigns_phylo_nodes[,1], assigns_phylo_nodes[,2])
       assigns_phylo_nodes <- assigns_phylo_nodes[match(mut_order, assigns_phylo_nodes_pos),3]
       
-      n_hundreds <- length(assigns_phylo_nodes) %/% 100
+      n_hundreds <- length(assigns_phylo_nodes) %/% bin_size
       clusters_ordered_by_100 = c()
       for (i in 1:n_hundreds)
       {
-          clusters_100 <- assigns_phylo_nodes[((i-1) * 100): min(length(assigns_phylo_nodes), (i * 100))]
+          clusters_100 <- assigns_phylo_nodes[((i-1) * bin_size): min(length(assigns_phylo_nodes), (i * bin_size))]
           max_cluster <- names(which.max(table(clusters_100)))
           clusters_ordered_by_100 <- c(clusters_ordered_by_100, max_cluster)
       }
@@ -436,7 +436,7 @@ extract_data_for_example <- function (example, dir_counts, tumortypes, dir_resul
   }
   
   # Hack because of the previous bug in the code that assigned 101 mutations to each time points
-  rows_keep <- (apply(vcfData, 1, sum) == 101) | (apply(vcfData, 1, sum) == 100)
+  rows_keep <- (apply(vcfData, 1, sum) == bin_size+1) | (apply(vcfData, 1, sum) == bin_size)
   vcfData <- vcfData[rows_keep, ]
     
   if (!is.null(phis))
@@ -524,7 +524,7 @@ extract_bootstrap_data_for_example <- function (example, bootstrap_counts) {
     }
   
        # Hack because of the previous bug in the code that assigned 101 mutations to each time points
-       rows_keep <- (apply(vcfData, 1, sum) == 101) | (apply(vcfData, 1, sum) == 100)
+       rows_keep <- (apply(vcfData, 1, sum) == bin_size+1) | (apply(vcfData, 1, sum) == bin_size)
     
        vcfData <- vcfData[rows_keep, ]
      
@@ -584,8 +584,8 @@ add_noise <- function(vcfData, noise_rate = 0.05)
 
 convert_window_to_indices <- function(total_length, window_size, gap)
 {
-  window_size = window_size/100
-  gap = gap/100
+  window_size = window_size/bin_size
+  gap = gap/bin_size
   
   start_ends <- c()
   

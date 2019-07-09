@@ -5,6 +5,8 @@ source("src/header.R")
 group = 0
 EXAMPLES_PER_GROUP <- 500
 
+bin_size = 100
+
 save_data_for_samples <- function(dir_counts = DIR_COUNTS,  bootstrap_counts = BOOTSTRAP_COUNTS)
 {
   print("Step 1: pre-processing")
@@ -49,24 +51,13 @@ save_data_for_samples <- function(dir_counts = DIR_COUNTS,  bootstrap_counts = B
       next
     }
     
-    if (sliding_window) { 
-      # Sliding window approach
-      data_method <- "sliding400"
-      window_size=400
-      shift = window_size/100
-      gap = 1
-      vcf <- get_sliding_window_data(vcfData, shift=shift, gap = gap)
-      phis_sliding_window <- get_sliding_window_data(toVerticalMatrix(phis), shift=shift)
-      phis_sliding_window <- phis_sliding_window / shift
+   
+    shift <- gap <- NULL
+    data_method <- "chunk100"
+    vcf <- t(vcfData)
+    phis_for_plot <- phis_sliding_window <- phis
       
-      phis_for_plot = phis_sliding_window
-    } else {
-      shift <- gap <- NULL
-      data_method <- "chunk100"
-      vcf <- t(vcfData)
-      phis_for_plot <- phis_sliding_window <- phis
-    }
-      
+
     if (!simulated_data) {
       purity = get_sample_purity(example)
       phis_for_plot = phis_for_plot / purity
@@ -89,13 +80,7 @@ save_data_for_samples <- function(dir_counts = DIR_COUNTS,  bootstrap_counts = B
         assigns_phylo_nodes_levels <- levels(assigns_phylo_nodes)
         assigns_phylo_nodes <- toVerticalMatrix(as.numeric(assigns_phylo_nodes))
         
-        if (sliding_window) {
-          assigns_phylo_nodes_sw <- get_sliding_window_data(assigns_phylo_nodes, shift=shift)
-          assigns_phylo_nodes_sw <- assigns_phylo_nodes_sw / shift
-          assigns_phylo_nodes_sw <- round(assigns_phylo_nodes_sw)
-        } else {
-          assigns_phylo_nodes_sw <- assigns_phylo_nodes
-        } 
+        assigns_phylo_nodes_sw <- assigns_phylo_nodes
         
         for (l in 1:length(assigns_phylo_nodes_levels))
         {
@@ -108,17 +93,6 @@ save_data_for_samples <- function(dir_counts = DIR_COUNTS,  bootstrap_counts = B
       }
       
       list[bootstrap_vcfs, bootstrap_phis] <- lapply(extract_bootstrap_data_for_example(example, bootstrap_counts), t)
-
-      if (compute_bootstrap) {
-        for (j in 1:length(bootstrap_phis))
-        {
-          if (sliding_window) {
-            bootstrap_vcfs[[j]] <- get_sliding_window_data(bootstrap_vcfs[[j]], shift=shift, gap = gap)
-            bootstrap_phis[[j]] <- get_sliding_window_data(toVerticalMatrix(bootstrap_phis[[j]]), shift=shift)
-            bootstrap_phis[[j]] <- bootstrap_phis[[j]] / shift
-          }
-        }
-      }
     }
 
     if (simulated_data) {

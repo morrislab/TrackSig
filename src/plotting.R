@@ -1,64 +1,5 @@
 # AUTHORS: Yulia Rubanova and Nil Sahin
 
-plotPhiSignatures <- function(map_only_known_signatures = FALSE) {
-  # This function takes in the 96 trinucleotide counts of each sample and
-  # plots the changes of the weights of the 30 mutational signatures during the tumor evolution.
-  # A plot showing the number of times each signature is chosen with the maximum change
-  # across all the samples and the tumor types are also outputted.
-  
-  load("saved_data/annotation_data.RData")
-  
-  filenames <- Sys.glob(paste0(DIR, "Counts-by-100/*.txt"))
-  
-  #   closeAllConnections()
-  #   cl <- makeCluster(detectCores()-1)
-  #   registerDoParallel(cl)
-  
-  for (vcfFile in filenames) {
-    info <- file.info(vcfFile) # Empty files will be ignored
-    if (info$size == 0) 
-      next
-    
-    example <- gsub(".*/([^/]*)\\.phi\\.txt","\\1", vcfFile)
-    list[vcfFile, vcfData, phis, acronym, dir_name] <- extract_data_for_example(example, DIR_COUNTS)
-    
-    if (nrow(vcfData) < 6) # Plots with less than 6 lines of data are meaningless so ignored
-      next
-    
-    print(paste("Computing signatures for ", vcfFile))
-    
-    # Consecutive rows are added in a new matrix (vcf) together to enhance meaningful regression
-    # vcf <- merge_data_chunks(vcfData)
-    window_size=400
-    shift = window_size/100
-    vcf <- get_sliding_window_data(vcfData, shift=shift)
-    phis_sliding_window <- get_sliding_window_data(toVerticalMatrix(phis), shift=shift)
-    phis_sliding_window <- phis_sliding_window / (shift+1)
-    colnames(vcf) <- round(phis_sliding_window, 3)
-    
-    alex.t <- alex
-    if (map_only_known_signatures)
-    {
-      list[alex.t, matched_type, acronym] <- get_signatures_for_current_sample(vcfFile, active_signatures.our_samples, alex)
-    }
-    # If mutational signatures were not found for this tumor type
-    if(is.null(alex.t))
-      next
-    
-    dd <- fit_signatures_linear_regression(vcf, alex.t, alpha = 0, lambda_type="lambda.min")
-    cp <- get_changepoints_per_row(dd)
-    
-    plot_dir <- ifelse(map_only_known_signatures, "plots_only_known_signatures/", "plots/")
-    plot_dir <- paste0(DIR, plot_dir, tumortypes[tumortypes$ID == vcfFile,]$tumor_type, "/")
-    if (!file.exists(plot_dir)) {
-      dir.create(plot_dir, recursive = T)
-    }
-    plot_name <- paste0(plot_dir, vcfFile, ".pdf")
-    plot_signatures(dd, plot_name=plot_name, fitted_data = cp, mark_max_signature = F)
-  }
-}
-
-
 plot_signatures <- function (dd, plot_name, phis = NULL, fitted_data = NULL, mark_max_signature=F, mark_change_points=F, 
                              change_points=NULL, error_bars = NULL, save=T,
                              assigns_phylo_nodes = NULL, scale = 1, ytitle = "Signature exposure (%)",
@@ -73,7 +14,6 @@ plot_signatures <- function (dd, plot_name, phis = NULL, fitted_data = NULL, mar
   sigs_to_remove <- apply(dd, 1, mean) < remove_sigs_below
   dd <- dd[!sigs_to_remove, ]
 
-
   # Weight matrix is edited with appropriate row and column names
   signatures <- rownames(dd)
   df <- data.frame(signatures,dd)
@@ -84,8 +24,8 @@ plot_signatures <- function (dd, plot_name, phis = NULL, fitted_data = NULL, mar
   for (n in 1:ncol(dd)) {
     col_names <- append(col_names, 150 - decrement*(n-1))
   }
-  
   colnames(df) <- col_names
+  #colnames(df) <- c("Signatures", round(phis,3 ))
   
   # Plotting the change of mutational signature weights during evolution specified as the order of phi
   # The signature with the maximum change is printed in the plot with the annotate function on ggplot (can be removed if unnecessary)
@@ -481,27 +421,6 @@ run_example <- function (example) {
   
   make_histogram(t(vcfData), paste0(dir_name, "mutation_hist.pdf"))
   
-  #   for (data_method in c("merged200", "sliding"))
-  #   {
-  data_method <- "sliding"
-  if (data_method == "data_method")
-  {
-    # Consecutive rows are added in a new matrix (vcf) together to enhance meaningful regression
-    vcf <- merge_data_chunks(vcfData)
-  }
-  if (data_method == "sliding")
-  {
-    # Make a sliding window of 400 mutations
-    window_size=400
-    shift = window_size/100
-    vcf <- get_sliding_window_data(vcfData, shift=shift)
-    phis_sliding_window <- get_sliding_window_data(toVerticalMatrix(phis), shift=shift)
-    phis_sliding_window <- phis_sliding_window / (shift+1)
-    colnames(vcf) <- round(phis_sliding_window, 3)
-    
-    data_method <- paste0(data_method, window_size)
-  }
-  
   for (sig_amount in c("all", "onlyKnownSignatures"))
   {
     if (sig_amount == "onlyKnownSignatures") {
@@ -526,11 +445,11 @@ run_example <- function (example) {
       
       dd <- fit_mixture_of_multinomials_matrix(vcf, alex.t, prior = prior)
       cp <- get_changepoints_per_row(dd)
-      plot_signatures(dd, plot_name=paste0(dir_name, acronym, "_", data_method, "_multMix_", sig_amount, "_", prior_type, ".pdf"), fitted_data = cp)
+      plot_signatures(dd, plot_name=paste0(dir_name, acronym, "_multMix_", sig_amount, "_", prior_type, ".pdf"), fitted_data = cp)
       
       overall_change_points <- get_changepoints_matrix_jointly(dd, lambda_type="lambda.1se")$change_points
       cp <- fit_mixture_of_multinomials_in_time_slices(vcf, overall_change_points, alex.t)
-      plot_signatures(dd, plot_name=paste0(dir_name, acronym, "_", data_method, "_multMix_fittedPerTimeSlice_", sig_amount, "_", prior_type, ".pdf"), 
+      plot_signatures(dd, plot_name=paste0(dir_name, acronym, "_multMix_fittedPerTimeSlice_", sig_amount, "_", prior_type, ".pdf"), 
                       fitted_data = cp, mark_max_signature=F)
       
       for (alpha in c(0,1))
@@ -545,7 +464,7 @@ run_example <- function (example) {
         {
           dd <- fit_signatures_linear_regression(vcf, alex.t, alpha = alpha, lambda_type=lambda_type, prior = prior)
           cp <- get_changepoints_per_row(dd)
-          plot_name <- paste0(dir_name, acronym, "_", data_method, "_", regression_type, "_", lambda_type, "_", sig_amount, "_", prior_type)
+          plot_name <- paste0(dir_name, acronym, "_", regression_type, "_", lambda_type, "_", sig_amount, "_", prior_type)
           #plot_signatures(cp, plot_name=paste0(plot_name, "_piecewise.pdf"), mark_max_signature=F)
           plot_signatures(dd, plot_name=paste0(plot_name, ".pdf"), fitted_data = cp)
           
