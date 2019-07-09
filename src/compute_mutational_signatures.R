@@ -5,8 +5,6 @@ source("src/header.R")
 group = 0
 EXAMPLES_PER_GROUP <- 500
 
-bin_size = 100
-
 save_data_for_samples <- function(dir_counts = DIR_COUNTS,  bootstrap_counts = BOOTSTRAP_COUNTS)
 {
   print("Step 1: pre-processing")

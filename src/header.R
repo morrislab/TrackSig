@@ -13,6 +13,9 @@ nmf.options(grid.patch=TRUE)
 #sig_amount <- "onlyKnownSignatures" # recommended
 sig_amount <- "onlyKnownSignatures" # not recommended, time-consuming
 
+# Number of mutations in each time point bin
+bin_size = 100
+
 # if the signatures are specified per cancer type or per sample
 cancer_type_signatures = T
 
