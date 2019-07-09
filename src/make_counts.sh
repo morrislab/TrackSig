@@ -18,6 +18,8 @@ do_bootstrap=true
 
 N_BOOTSTRAPS=30
 
+bin_size=100
+
 log_dir="."
 
 min_number() {
@@ -99,18 +101,18 @@ fi
 
 num_mutations=$(min_number `cat $phi_file | wc -l` `cat $vcf_file | wc -l`)
 
-num_hundreds=$(($num_mutations/100 + ($num_mutations % 100 > 0))) 
+num_hundreds=$(($num_mutations/$bin_size + ($num_mutations % $bin_size > 0))) 
 
 if [ ! -f $mutation_counts_file ]; then
-	if [ $num_mutations -lt 100 ]; then
-		echo "Less than 100 mutaions in a file $vcf_file or $phi_file" 
+	if [ $num_mutations -lt $bin_size ]; then
+		echo "Less than $bin_size mutaions in a file $vcf_file or $phi_file" 
 		touch $mutation_counts_file
 	else
 		echo "Count file..."
 			for i in `seq 1 $num_hundreds`; do
-			if [ $num_mutations -ge $((i*100-1)) ]; then 
-					###echo $i $((i*100-1))
-				python $make_hundreds_script $mutation_types_file  $((i*100-100)) $((i*100-1)) >> $mutation_counts_file #2>>$log_dir/log.txt
+			if [ $num_mutations -ge $((i*$bin_size-1)) ]; then 
+
+				python $make_hundreds_script $mutation_types_file  $((i*$bin_size-$bin_size)) $((i*$bin_size-1)) >> $mutation_counts_file #2>>$log_dir/log.txt
 				rc=$?; if [[ $rc != 0 ]]; then exit $rc; fi
 				fi
 		done
@@ -143,7 +145,7 @@ if [ "$do_bootstrap" = true ] ; then
 
 	if [ ! -f $mutation_bootstrap_file_unsorted ] || [ ! -s  $mutation_bootstrap_file_unsorted ] || [ ! -f $mutation_bootstrap_file ] || [ ! -s  $mutation_bootstrap_file ]; then
 
-		if [ $num_mutations -lt 100 ]; then
+		if [ $num_mutations -lt $bin_size ]; then
 					touch $mutation_bootstrap_file
 			else
 			    # echo "Bootstrap mutations..."
@@ -157,8 +159,8 @@ if [ "$do_bootstrap" = true ] ; then
 	 if [ ! -f $mutation_bootstrap_counts_file ] || [ ! -s  $mutation_bootstrap_counts_file ]; then
 			# echo "Bootstrap counts..."
 			for t in `seq 1 $num_hundreds`; do
-				if [ $num_mutations -ge $((t*100-1)) ]; then
-					python $make_hundreds_script $mutation_bootstrap_file  $((t*100-100)) $((t*100-1)) >> $mutation_bootstrap_counts_file #2>>$log_dir/log.txt
+				if [ $num_mutations -ge $((t*$bin_size-1)) ]; then
+					python $make_hundreds_script $mutation_bootstrap_file  $((t*$bin_size-$bin_size)) $((t*$bin_size-1)) >> $mutation_bootstrap_counts_file #2>>$log_dir/log.txt
 					rc=$?; if [[ $rc != 0 ]]; then exit $rc; fi
 				fi
 			done
